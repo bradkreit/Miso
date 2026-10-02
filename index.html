@@ -73,7 +73,9 @@ function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 let best=+(load('misoBest')||0),unlocked=load('misoEndless')==='1';
 let map,info,dish,miso,critters=[],cat,food=100,bacon=null,baconTimer=0,zoom=0,caught=0,queued=null,mp={x:0,y:0};
 let parts=[],texts=[],buttons=[];
-
+const titleImg=new Image();let titleReady=false;
+titleImg.onload=()=>{titleReady=true;};
+titleImg.src='title.png';
 /* ---------- layout ---------- */
 function layout(){
  const dpr=Math.min(window.devicePixelRatio||1,2);W=innerWidth;H=innerHeight;
@@ -494,8 +496,12 @@ function sceneLayout(){
 function button(label,x,y,w,h,act){rr(x-w/2,y-h/2,w,h,h/2,'#a3784a','#5b3c1e');txt(label,x,y,h*.4,'#fff');buttons.push({x:x-w/2,y:y-h/2,w,h,act});}
 function drawTitle(){
  ctx.fillStyle='#bff0f7';ctx.fillRect(0,0,W,H);
- const L=sceneLayout();drawBadge(L.cx,L.cy,L.r,false);
- let y=L.y0;const bw=Math.min(260,W-60);
+ const L=sceneLayout();
+ if(titleReady){
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);
+  const h=L.r*2+10,w=titleImg.width*h/titleImg.height;
+  ctx.drawImage(titleImg,L.cx-w/2,L.cy-h/2,w,h);
+ }else drawBadge(L.cx,L.cy,L.r,false); let y=L.y0;const bw=Math.min(260,W-60);
  button('Play',L.bx,y,bw,56,()=>startGame(false));y+=72;
  if(unlocked)button('Endless mode',L.bx,y,bw,56,()=>startGame(true));
  else txt('🔒 Beat the story to unlock Endless',L.bx,y,14,'#5b3c1e');
