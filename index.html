@@ -280,7 +280,58 @@ function txt(s,x,y,size,col,align,weight,stroke){ctx.font=(weight||'bold')+' '+s
 function serif(s,x,y,size,col,align){ctx.font='700 '+size+'px Georgia,"Times New Roman",serif';ctx.textAlign=align||'center';ctx.textBaseline='middle';ctx.fillStyle=col;ctx.fillText(s,x,y);}
 
 /* ---------- characters ---------- */
-function drawMiso(x,y,s,flip,round,bob,mouth){
+function drawFatCat(x,y,k){
+ E(x,y+k*.62,k*.95,k*.14,'rgba(0,0,0,.2)');
+ ctx.strokeStyle='#857c72';ctx.lineWidth=k*.12;ctx.lineCap='round';ctx.beginPath();
+ ctx.moveTo(x+k*.55,y+k*.45);ctx.quadraticCurveTo(x+k*1.05,y+k*.5,x+k*.95,y+k*.05+Math.sin(time*3)*k*.08);ctx.stroke();
+ E(x,y+k*.15,k*.78,k*.6,'#8f877d',0,1);
+ E(x,y+k*.25,k*.5,k*.42,'#c9c1b6');
+ ctx.strokeStyle='#4d453e';ctx.lineWidth=Math.max(2,k*.05);
+ for(const sd of[-1,1])for(const dy of[-.1,.12,.34]){ctx.beginPath();ctx.moveTo(x+sd*k*.74,y+k*dy);ctx.lineTo(x+sd*k*.54,y+k*(dy+.05));ctx.stroke();}
+ for(let i=0;i<5;i++)C(x+k*(-.25+i*.13),y+k*(.2+((i*37)%5)*.06),k*.025,'#8a5a2b');
+ E(x-k*.35,y+k*.68,k*.18,k*.1,'#968e84',0,1);E(x+k*.35,y+k*.68,k*.18,k*.1,'#968e84',0,1);
+ E(x-k*.28,y+k*.1,k*.13,k*.1,'#968e84',0,1);E(x+k*.28,y+k*.1,k*.13,k*.1,'#968e84',0,1);
+ const hy=y-k*.52+Math.sin(time*2)*k*.02;
+ tri([x-k*.38,hy-k*.1],[x-k*.3,hy-k*.48],[x-k*.08,hy-k*.28],'#8f877d');
+ tri([x+k*.08,hy-k*.28],[x+k*.3,hy-k*.48],[x+k*.38,hy-k*.1],'#8f877d');
+ E(x,hy,k*.42,k*.34,'#968e84',0,1);
+ ctx.strokeStyle='#4d453e';ctx.lineWidth=Math.max(2,k*.03);
+ for(const dx of[-.08,0,.08]){ctx.beginPath();ctx.moveTo(x+k*dx,hy-k*.31);ctx.lineTo(x+k*dx,hy-k*.18);ctx.stroke();}
+ E(x-k*.26,hy+k*.1,k*.08,k*.05,'rgba(255,130,160,.5)');E(x+k*.26,hy+k*.1,k*.08,k*.05,'rgba(255,130,160,.5)');
+ ctx.strokeStyle='#222';ctx.lineWidth=Math.max(2,k*.035);ctx.lineCap='round';
+ for(const ex of[-.15,.15]){ctx.beginPath();ctx.arc(x+k*ex,hy-k*.02,k*.07,Math.PI*1.1,Math.PI*1.9);ctx.stroke();}
+ tri([x-k*.04,hy+k*.06],[x+k*.04,hy+k*.06],[x,hy+k*.11],'#e88a9a');
+ ctx.beginPath();ctx.arc(x-k*.04,hy+k*.12,k*.04,0,Math.PI);ctx.moveTo(x+k*.08,hy+k*.12);ctx.arc(x+k*.04,hy+k*.12,k*.04,0,Math.PI);ctx.stroke();
+ E(x+k*.05,hy+k*.19,k*.035,k*.045,'#e86a86');
+ ctx.strokeStyle='#eee';ctx.lineWidth=1.5;ctx.beginPath();
+ for(const sd of[-1,1]){ctx.moveTo(x+sd*k*.18,hy+k*.1);ctx.lineTo(x+sd*k*.55,hy+k*.04);ctx.moveTo(x+sd*k*.18,hy+k*.12);ctx.lineTo(x+sd*k*.55,hy+k*.18);}
+ ctx.stroke();
+}
+function drawLoseScene(){
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#ffc98a');g.addColorStop(.6,'#ffeccc');
+ ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ const s=Math.min(W*.34,H*.24),cx=W/2,cy=H*.4,gy=cy+s*.7;
+ ctx.fillStyle='#86e352';ctx.fillRect(0,gy,W,H-gy);
+ ctx.strokeStyle='#222';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();
+ ctx.save();ctx.translate(cx-s*.98,cy+s*.6);ctx.rotate(.35);drawDish(0,0,s*.6,0);ctx.restore();
+ drawFatCat(cx,cy,s);
+ drawMiso(cx+s*1.0,cy+s*.5,s*.55,true,0,0,0);
+ E(cx+s*.9,cy+s*.42+((time*.8)%1)*s*.12,s*.025,s*.04,'#5ab6e6');
+ for(let i=0;i<4;i++){const ph=(time*.5+i/4)%1;ctx.globalAlpha=1-ph;
+  txt('♥',cx+Math.sin(i*2.3+time)*s*.45,cy-s*.95-ph*s*.7,s*.16,'#ff6fa8');ctx.globalAlpha=1;}
+ if(time%4<.8)txt('burp!',cx+s*.5,cy-s*.95,s*.15,'#7a4a12','center','bold','#fff');
+ let y=gy+s*.55;
+ if(endless){
+  txt('Watermelon wins!',cx,y,24,'#2b1d10');y+=34;
+  txt('Score '+score+'   •   Best '+best,cx,y,17,'#5b3c1e');y+=40;
+  txt('Tap for menu',cx,y,17,'#b5541e');
+ }else{
+  txt("Watermelon ate Miso's dinner!",cx,y,20,'#2b1d10');y+=30;
+  txt('She is extremely pleased with herself.',cx,y,15,'#5b3c1e','center','normal');y+=40;
+  txt('Tap to try again',cx,y,17,'#b5541e');
+ }
+}
+ function drawMiso(x,y,s,flip,round,bob,mouth){
  const k=s*.42*(1+round);
  ctx.save();ctx.translate(x,y);if(flip)ctx.scale(-1,1);
  E(0,k*.85,k,k*.22,'rgba(30,100,20,.3)');
@@ -528,6 +579,7 @@ function draw(){
  buttons=[];
  if(state==='title')return drawTitle();
  if(state==='victory')return drawVictory();
+ if(state==='lose'||state==='gameover')return drawLoseScene();
  drawGame();
  if(state==='intro'){const c=cfg();card([[c.title,26]].concat(c.lines.map(l=>[l,16]),[['Tap to start',18,'#b5541e']]));}
  else if(state==='clear')card([[endless?'Round cleared!':'Level clear!',26],['Dinner bonus +'+bonus,16],['Tap to continue',18,'#b5541e']]);
